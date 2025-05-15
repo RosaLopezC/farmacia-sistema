@@ -15,12 +15,13 @@ import roleRoutes from "./app/routes/role.routes.js";
 
 const app = express();
 
-const corsOptions = {
-  origin: true,
-  credentials: true,
-};
+// Configuración de CORS para producción
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://tu-frontend.onrender.com']
+    : 'http://localhost:5173'
+}));
 
-app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -175,6 +176,13 @@ db.sequelize.sync({ force: true }).then(async () => {
   await initial();
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
-});
+db.sequelize.authenticate()
+  .then(() => {
+    console.log('Conexión a la base de datos establecida.');
+    app.listen(PORT, () => {
+      console.log(`Servidor corriendo en puerto ${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error('Error conectando a la base de datos:', err);
+  });
