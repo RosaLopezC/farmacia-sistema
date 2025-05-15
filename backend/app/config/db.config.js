@@ -6,22 +6,16 @@ export default {
   DB: process.env.DB_NAME || "db_farmacia_mtvc",
   dialect: "postgres",
   port: process.env.DB_PORT || 5432,
-  pool: {
-    max: 5,
-    min: 0,
-    acquire: 60000, // Increased timeout
-    idle: 10000
-  },
   dialectOptions: {
     ssl: {
       require: true,
       rejectUnauthorized: false
-    },
-    keepAlive: true,
-    connectTimeout: 60000 // Added connection timeout
+    }
   },
-  logging: false,
-  retry: {
-    max: 5 // Added retry attempts
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
   }
 };
