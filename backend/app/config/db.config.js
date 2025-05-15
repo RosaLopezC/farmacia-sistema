@@ -1,23 +1,22 @@
 // app/config/db.config.js
 export default {
-  HOST: process.env.DB_HOST || "dpg-d0j39fp5pdvs73ekpelg-a.oregon-postgres.render.com",
-  USER: process.env.DB_USER || "db_farmacia_mtvc_user",
-  PASSWORD: process.env.DB_PASSWORD || "lzQJ3mGFGnRTazffhkiS5yVsVeb7VD5R",
-  DB: process.env.DB_NAME || "db_farmacia_mtvc",
+  HOST: process.env.DB_HOST,
+  USER: process.env.DB_USER,
+  PASSWORD: process.env.DB_PASSWORD,
+  DB: process.env.DB_NAME,
   dialect: "postgres",
-  port: process.env.DB_PORT || 5432,
+  port: process.env.DB_PORT,
   dialectOptions: {
     ssl: {
       require: true,
       rejectUnauthorized: false
-    },
-    keepAlive: true
+    }
   },
   pool: {
-    max: 5,
+    max: 3,
     min: 0,
     acquire: 60000,
-    idle: 10000
+    idle: 30000
   },
-  logging: false
+  logging: process.env.NODE_ENV !== 'production'
 };

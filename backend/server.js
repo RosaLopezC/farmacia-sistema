@@ -42,147 +42,157 @@ app.use("/api/roles", roleRoutes);
 
 const PORT = process.env.PORT || 3000;
 
-// Inicializar roles
+// Función de inicialización modificada
 const initial = async () => {
   try {
-    // 1. Crear roles base
-    await db.role.bulkCreate([
-      { id: 1, name: "user" },
-      { id: 2, name: "moderator" },
-      { id: 3, name: "admin" }
-    ]);
-    console.log("✅ Roles creados exitosamente");
+    await db.sequelize.authenticate();
+    console.log('✅ Conexión a la base de datos establecida.');
 
-    // 2. Crear tipos de medicamentos
-    await db.tipomedic.bulkCreate([
-      { nombre: "Analgésico", descripcion: "Medicamentos para el dolor" },
-      { nombre: "Antibiótico", descripcion: "Medicamentos contra infecciones" }
-    ]);
-    console.log("✅ Tipos de medicamentos creados exitosamente");
+    // Solo sincronizar en desarrollo o primera vez
+    if (process.env.NODE_ENV !== 'production') {
+      await db.sequelize.sync({ force: true });
+      console.log('🔄 Base de datos sincronizada.');
+      
+      // 1. Crear roles base
+      await db.role.bulkCreate([
+        { id: 1, name: "user" },
+        { id: 2, name: "moderator" },
+        { id: 3, name: "admin" }
+      ]);
+      console.log("✅ Roles creados exitosamente");
 
-    // 3. Crear especialidades
-    await db.especialidad.bulkCreate([
-      { nombre: "Cardiología", descripcion: "Especialidad del corazón" },
-      { nombre: "Pediatría", descripcion: "Especialidad infantil" }
-    ]);
-    console.log("✅ Especialidades creadas exitosamente");
+      // 2. Crear tipos de medicamentos
+      await db.tipomedic.bulkCreate([
+        { nombre: "Analgésico", descripcion: "Medicamentos para el dolor" },
+        { nombre: "Antibiótico", descripcion: "Medicamentos contra infecciones" }
+      ]);
+      console.log("✅ Tipos de medicamentos creados exitosamente");
 
-    // 4. Crear laboratorios
-    await db.laboratorio.bulkCreate([
-      { nombre: "Bayer", direccion: "Alemania", telefono: "123456789" },
-      { nombre: "Pfizer", direccion: "USA", telefono: "987654321" }
-    ]);
-    console.log("✅ Laboratorios creados exitosamente");
+      // 3. Crear especialidades
+      await db.especialidad.bulkCreate([
+        { nombre: "Cardiología", descripcion: "Especialidad del corazón" },
+        { nombre: "Pediatría", descripcion: "Especialidad infantil" }
+      ]);
+      console.log("✅ Especialidades creadas exitosamente");
 
-    // 5. Crear medicamentos
-    await db.medicamento.bulkCreate([
-      {
-        nombre: "Paracetamol",
-        descripcion: "Analgésico común",
-        precio: 5.99,
-        stock: 100,
-        CodTipoMed: 1,
-        CodEspec: 1
-      },
-      {
-        nombre: "Amoxicilina",
-        descripcion: "Antibiótico general",
-        precio: 15.99,
-        stock: 50,
-        CodTipoMed: 2,
-        CodEspec: 2
-      }
-    ]);
-    console.log("✅ Medicamentos creados exitosamente");
+      // 4. Crear laboratorios
+      await db.laboratorio.bulkCreate([
+        { nombre: "Bayer", direccion: "Alemania", telefono: "123456789" },
+        { nombre: "Pfizer", direccion: "USA", telefono: "987654321" }
+      ]);
+      console.log("✅ Laboratorios creados exitosamente");
 
-    // 6. Crear órdenes de compra
-    const orden = await db.ordencompra.create({
-      fechaEmision: new Date(),
-      Situacion: "PENDIENTE",
-      Total: 500.00,
-      CodLab: 1,
-      NrofacturaProv: "FAC001"
-    });
+      // 5. Crear medicamentos
+      await db.medicamento.bulkCreate([
+        {
+          nombre: "Paracetamol",
+          descripcion: "Analgésico común",
+          precio: 5.99,
+          stock: 100,
+          CodTipoMed: 1,
+          CodEspec: 1
+        },
+        {
+          nombre: "Amoxicilina",
+          descripcion: "Antibiótico general",
+          precio: 15.99,
+          stock: 50,
+          CodTipoMed: 2,
+          CodEspec: 2
+        }
+      ]);
+      console.log("✅ Medicamentos creados exitosamente");
 
-    // 7. Crear detalles de orden
-    await db.detalleordencompra.bulkCreate([
-      {
-        NroOrdenC: orden.NroOrdenC,
-        CodMedicamento: 1,
-        descripcion: "Paracetamol 500mg",
-        cantidad: 100,
-        precio: 5.00,
-        montouni: 500.00
-      }
-    ]);
-    console.log("✅ Órdenes de compra creadas exitosamente");
-
-    // 8. Crear órdenes de venta
-    await db.ordenventa.bulkCreate([
-      {
-        fecha: new Date(),
-        total: 100.00,
-        estado: "PENDIENTE"
-      }
-    ]);
-    console.log("✅ Órdenes de venta creadas exitosamente");
-
-    // 9. Crear usuarios por defecto
-    const users = [
-      {
-        username: "admin",
-        email: "admin@example.com",
-        password: bcrypt.hashSync("admin123", 8),
-        role: "admin"
-      },
-      {
-        username: "moderador",
-        email: "mod@example.com",
-        password: bcrypt.hashSync("mod123", 8),
-        role: "moderator"
-      },
-      {
-        username: "usuario",
-        email: "user@example.com",
-        password: bcrypt.hashSync("user123", 8),
-        role: "user"
-      }
-    ];
-
-    for (let user of users) {
-      const createdUser = await db.user.create({
-        username: user.username,
-        email: user.email,
-        password: user.password
+      // 6. Crear órdenes de compra
+      const orden = await db.ordencompra.create({
+        fechaEmision: new Date(),
+        Situacion: "PENDIENTE",
+        Total: 500.00,
+        CodLab: 1,
+        NrofacturaProv: "FAC001"
       });
 
-      const role = await db.role.findOne({
-        where: { name: user.role }
-      });
+      // 7. Crear detalles de orden
+      await db.detalleordencompra.bulkCreate([
+        {
+          NroOrdenC: orden.NroOrdenC,
+          CodMedicamento: 1,
+          descripcion: "Paracetamol 500mg",
+          cantidad: 100,
+          precio: 5.00,
+          montouni: 500.00
+        }
+      ]);
+      console.log("✅ Órdenes de compra creadas exitosamente");
 
-      await createdUser.setRoles([role]);
-      console.log(`Usuario ${user.username} creado con rol ${user.role}`);
+      // 8. Crear órdenes de venta
+      await db.ordenventa.bulkCreate([
+        {
+          fecha: new Date(),
+          total: 100.00,
+          estado: "PENDIENTE"
+        }
+      ]);
+      console.log("✅ Órdenes de venta creadas exitosamente");
+
+      // 9. Crear usuarios por defecto
+      const users = [
+        {
+          username: "admin",
+          email: "admin@example.com",
+          password: bcrypt.hashSync("admin123", 8),
+          role: "admin"
+        },
+        {
+          username: "moderador",
+          email: "mod@example.com",
+          password: bcrypt.hashSync("mod123", 8),
+          role: "moderator"
+        },
+        {
+          username: "usuario",
+          email: "user@example.com",
+          password: bcrypt.hashSync("user123", 8),
+          role: "user"
+        }
+      ];
+
+      for (let user of users) {
+        const createdUser = await db.user.create({
+          username: user.username,
+          email: user.email,
+          password: user.password
+        });
+
+        const role = await db.role.findOne({
+          where: { name: user.role }
+        });
+
+        await createdUser.setRoles([role]);
+        console.log(`Usuario ${user.username} creado con rol ${user.role}`);
+      }
+      
+      console.log('Base de datos inicializada con roles, tipos de medicamentos, especialidades, laboratorios y usuarios');
     }
-    
-    console.log('Base de datos inicializada con roles, tipos de medicamentos, especialidades, laboratorios y usuarios');
   } catch (error) {
-    console.error("Error inicializando la base de datos:", error);
-    console.error("Detalle del error:", error.stack);
+    console.error('❌ Error inicializando la base de datos:', error);
+    process.exit(1);
   }
 };
 
-db.sequelize.sync({ force: true }).then(async () => {
-  console.log('Drop and re-sync db.');
-  await initial();
-});
-
-db.sequelize.authenticate()
-  .then(() => {
-    console.log('Conexión a la base de datos establecida.');
+// Iniciar servidor
+const startServer = async () => {
+  try {
+    await initial();
+    
     app.listen(PORT, () => {
-      console.log(`Servidor corriendo en puerto ${PORT}`);
+      console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
     });
-  })
-  .catch(err => {
-    console.error('Error conectando a la base de datos:', err);
-  });
+  } catch (error) {
+    console.error('❌ Error iniciando el servidor:', error);
+    process.exit(1);
+  }
+};
+
+// Iniciar la aplicación
+startServer();
