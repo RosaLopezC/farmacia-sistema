@@ -10,12 +10,14 @@ export default {
     ssl: {
       require: true,
       rejectUnauthorized: false
-    }
+    },
+    keepAlive: true
   },
   pool: {
     max: 5,
     min: 0,
-    acquire: 30000,
+    acquire: 60000,
     idle: 10000
-  }
+  },
+  logging: false
 };
