@@ -1,6 +1,9 @@
 import axios from 'axios';
+import { AUTH_API } from '../config/api.config';
 
-const API = 'http://localhost:3000/api/auth';
+// Reemplazar la constante API
+// const API = 'http://localhost:3000/api/auth';
+const API = AUTH_API;
 
 export const login = async (credentials) => {
   const res = await axios.post(`${API}/signin`, credentials);
